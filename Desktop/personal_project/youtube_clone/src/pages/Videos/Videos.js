@@ -1,3 +1,6 @@
+import { useParams } from "react-router-dom"
+
 export const Videos = () => {
-    return <div>videos</div>
+    const {keyword} = useParams() //get from url
+    return <div>Videos/{`${keyword ? keyword : ""}`}</div>
 }
