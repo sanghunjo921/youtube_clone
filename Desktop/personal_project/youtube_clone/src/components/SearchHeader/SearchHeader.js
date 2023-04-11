@@ -8,7 +8,7 @@ import { commonSetting } from '../../setting/setting';
 
 export const SearchHeader = () => {
     const [keyword, setKeyword] = useState("");
-    const navigate = useNavigate();
+    const navigate = useNavigate(); //document.location.href in javascript 
 
     //useEffect: 컴포넌트가 렌더링 된 후 한번 해주기 위해 
 
@@ -23,7 +23,7 @@ export const SearchHeader = () => {
     return <header className="w-full flex p-4 text-2xl border-b border-zinc-600 mb-4">
         <Link to="/" className='flex item-center '> 
             <BsYoutube className='text-4xl text-main_logo' />
-            <hi className="font-bold ml-2 text-3xl">{commonSetting.title}</hi>
+            <h1 className="font-bold ml-2 text-3xl">{commonSetting.title}</h1>
         </Link>
         <form className="w-full flex justify-center" onSubmit={onSubmit}>
             <input className="w-7/12 p-2 outline-none bg-black text-gray-50" type="text" placeholder='Search...' value={keyword} onChange={(e) => setKeyword(e.target.value)}/>
