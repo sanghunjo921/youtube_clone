@@ -1,4 +1,6 @@
+import { Link } from "react-router-dom"
 
 export const Video = ({video}) => {
-    return <div>{video.snippet.title}</div>
+
+    return <Link to={`/videos/watch/${video?.snippet?.title || video?.title}`}>{video?.snippet?.title || video?.description}</Link>
 }

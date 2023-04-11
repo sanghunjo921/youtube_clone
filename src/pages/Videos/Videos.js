@@ -5,15 +5,16 @@ import { Video } from "../../components/Video";
 import {  YoutubeService } from "../../services/YoutubeService";
 import { MockYoutubeService } from "../../services/MockYoutubeService";
 import { commonSetting } from "../../setting/setting";
+import { MockVideoService } from "../../services/MockVideoService";
 
 
 export const Videos = () => {
     const { keyword } = useParams() //get dynamic id from url
-    // const getVideos = async () => {
-    //     return axios.get(`/${queryKeys.videos}/${keyword ? 'search' : 'popular'}.json`).then((res) => res.data.items);
-    // };
-
     const { isLoading, isError, data: videos, } = useQuery([queryKeys.videos, keyword], () => {
+        if (commonSetting.isVideoMock) {
+            const videoService = new MockVideoService();
+            return videoService.search();
+        }
         const youtubeService = commonSetting.isProduct? new YoutubeService() : new MockYoutubeService(); 
         console.log(youtubeService);
         return youtubeService.search(keyword);
@@ -23,7 +24,7 @@ export const Videos = () => {
         <div>Videos/{`${keyword ? keyword : ""}`}</div>
         {isLoading && <p>Loading...</p>}
         {isError && <p>Something is wrong !</p>}
-        {videos && videos.map((video) => <Video key={video.id.videoId} video={video}/>)}
+        {videos && videos.map((video) => <Video key={video?.id?.videoId || video?.title} video={video}/>)}
     </>
     // use key value for rerendering otherwise undefined error => always rerendering & bad performance 
     )

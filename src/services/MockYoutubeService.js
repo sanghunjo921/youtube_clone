@@ -3,7 +3,7 @@ import axios from "axios"
 
 export class MockYoutubeService {
     constructor() {
-        console.log("mock");
+        console.log("mockYoutube");
     }
  
     async search(keyword) {
