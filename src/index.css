@@ -30,3 +30,7 @@ code {
     monospace;
 }
 
+
+.visible {
+  opacity: 1 !important;
+}

@@ -1,0 +1,11 @@
+.videoContainer {
+    position: relative;
+}
+
+.videoContoller {
+    opacity: 0;
+    transition: all 0.5s linear; 
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+}
