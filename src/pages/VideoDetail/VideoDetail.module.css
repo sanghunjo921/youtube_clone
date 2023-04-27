@@ -1,0 +1,42 @@
+.videoContainer {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+}
+
+
+.videoContainer video {
+    
+    height: 100%;
+}
+
+.videoContoller {
+    opacity: 0;
+    transition: all 0.5s linear; 
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    background-color: rgba(0,0,0,0.5);
+    width: 95%;
+    height: 50px;
+    display:flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.videoContoller div {
+    display: flex;
+    gap: 12px;
+    margin: 12px;
+
+}
+
+.statusBar {
+    position: absolute;
+    bottom: 4rem;
+    width:100%;
+}
+
+
+
