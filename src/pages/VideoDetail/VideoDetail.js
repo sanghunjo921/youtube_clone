@@ -5,20 +5,21 @@ import { MockVideoService } from "../../services/MockVideoService";
 import {  useEffect, useRef, useState } from "react";
 import { timeFormat } from "../../common/util";
 import styles from "./VideoDetail.module.css";
-import throttle from 'lodash/throttle';
+
 
 
 export const VideoDetail = () => {
+    let timeoutForControlsId = null;
+    let timeForMovement = null; 
     const videoElement = useRef();
     const controllerContainerEl = useRef();
-    let timeoutId = null;
     const [currentTime, setCurrentTime] = useState("0:00");
     const [duration, setDuration] = useState("0:00");
     const videoContainerElement = useRef();
     const [volume, setVolume] = useState(0);
     const [playTime, setPlayTime] = useState(0);
     const [screen, setScreen] = useState("Full");
-    const [controlName, setControlName] = useState('play');
+    const [controlName, setControlName] = useState('pause');
     const {videoId} = useParams();
     const {  data: video, } = useQuery([queryKeys.videos, videoId], () => { 
         const videoService = new MockVideoService();
@@ -35,6 +36,8 @@ export const VideoDetail = () => {
             setControlName('play');
         }
     }
+
+
 
     const volumeHandler = (e) => {
         setVolume(e.target.value)
@@ -54,16 +57,19 @@ export const VideoDetail = () => {
 
     
     useEffect(() => {
-        videoElement.current?.addEventListener("loadedmetadata", () => {
+        if (videoElement.current) {
+        videoElement.current.addEventListener("loadedmetadata", () => {
             setDuration(timeFormat(videoElement.current?.duration))
          })
-        videoElement.current?.addEventListener("timeupdate", () => {
-            setCurrentTime(timeFormat(videoElement.current?.currentTime));
+        videoElement.current.addEventListener("timeupdate", () => {
+            setCurrentTime(timeFormat(videoElement.current.currentTime));
             setPlayTime(videoElement.current?.currentTime)
         });
 
-        videoElement.current?.addEventListener("mousemove", throttle(mouseMoveHandler, 300));
-        videoElement.current?.addEventListener("mouseleave", throttle(mouseLeaveHandler, 300));
+        videoContainerElement.current.addEventListener("mousemove", mouseMoveHandler, 500);
+        videoContainerElement.current.addEventListener("mouseleave", mouseLeaveHandler, 100);
+        setVolume(videoElement.current.volume)
+    }
     }, [video])
 
     const playTimeHandler = (e) => {
@@ -71,28 +77,40 @@ export const VideoDetail = () => {
         videoElement.current.currentTime = e.target.value
     }
 
-    const mouseMoveHandler = (e) => {
-        console.log(e.target)
-        if (timeoutId) {
-            clearTimeout(timeoutId)
-            timeoutId = null
-        }
-        timeoutId = setTimeout(() => {
-            controllerContainerEl.current.classList.add("visible");
-        }, 500)
+    const hideControls = () => {
+        controllerContainerEl.current?.classList.remove("visible");
+    }
 
+    const mouseMoveHandler = (e) => {
+        if (timeoutForControlsId) {
+            clearTimeout(timeoutForControlsId)
+            timeoutForControlsId = null
+        }
+
+        if (timeForMovement) {
+            clearTimeout(timeForMovement)
+            timeForMovement = null
+        }
+
+        controllerContainerEl.current.classList.add("visible");
+        timeForMovement = setTimeout(hideControls, 2000)
     }
 
     const mouseLeaveHandler = () => {
-        if (timeoutId) {
-            clearTimeout(timeoutId)
-            timeoutId = null
-        }
-        timeoutId = setTimeout(() => {
-            controllerContainerEl.current.classList.remove("visible");
-        }, 500)
+        timeoutForControlsId = setTimeout(hideControls, 2000)
         
     }
+
+    const getVolumeIcon = () => {
+        if (volume === 0) {
+            return <i className="fa-solid fa-volume-xmark"></i>
+        } else if (volume >= 0.5) {
+            return <i className="fa-solid fa-volume-high"></i>
+        } else if (volume < 0.5) {
+            return <i className="fa-solid fa-volume-low"></i>
+        }
+    }
+
 
     return <div>
 
@@ -103,27 +121,35 @@ export const VideoDetail = () => {
                 <video name="media"  ref={videoElement} autoPlay onClick={playHandler}>
                     <source src={video.sources[0]} type="video/mp4"></source>
                 </video> 
-                {
+                {   
                     
                     <div ref={controllerContainerEl} className={styles.videoContoller}>
-                    <button onClick={playHandler}>{controlName === 'play' ? <i className="fa-solid fa-play"></i> : <i className="fa-solid fa-pause"></i>}</button>
-                    <input type="range" min="0" max="1" step="0.1" value={volume} onChange={volumeHandler} />
-                    <button onClick={screenHandler}>{screen === 'Full' ? <i className="fa-solid fa-expand"></i> : <i className="fa-solid fa-compress"></i>}</button>
-                    <button><i className="fa-solid fa-volume-low"></i></button>
-                    <button><i className="fa-solid fa-volume-slash"></i></button>
-                    <button><i className="fa-solid fa-volume-high"></i></button>
-                        <div>
-                        <span>
-                            {currentTime}
-                            </span> 
-                             / 
-                            <span>
-                                {duration}
-                            </span>
-                        </div>
-                        <input type="range" min="0" max= {Math.floor(videoElement.current?.duration)} step="1" value={playTime} onChange={playTimeHandler} />
 
+                    
+                    <input className={styles.statusBar} type="range" min="0" max= {Math.floor(videoElement.current?.duration)} step="1" value={playTime} onChange={playTimeHandler} />
+                    
+
+                        <div>
+                            <button onClick={playHandler}>{controlName === 'play' ? <i className="fa-solid fa-play"></i> : <i className="fa-solid fa-pause"></i>}</button>
+                        
+                           <button> {getVolumeIcon()}</button>
+                            
+                            <input type="range" min="0" max="1" step="0.1" value={volume} onChange={volumeHandler} />
+                            <div>
+                    <span>
+                        {currentTime}
+                        </span> 
+                         / 
+                        <span>
+                            {duration}
+                        </span>
                     </div>
+                        </div>
+                        <div>
+                        <button onClick={screenHandler}>{screen === 'Full' ? <i className="fa-solid fa-expand"></i> : <i className="fa-solid fa-compress"></i>}</button>
+                        </div>
+                    </div>
+                    
                 }
                            </div>
         }
