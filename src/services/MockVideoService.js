@@ -10,7 +10,7 @@ export class MockVideoService {
     }
 
     async searchByTitle(title) {
-        return (await this.#mostPopularVideos()).find(video => video.title == title)
+        return (await this.#mostPopularVideos()).find(video => video.title === title)
     }
 
     async #searchByKeyword(keyword = '') {

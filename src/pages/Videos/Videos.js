@@ -1,30 +1,19 @@
 import { useParams } from "react-router-dom"
-import {useQuery } from '@tanstack/react-query'
-import {queryKeys} from "../../common/Constants";
 import { Video } from "../../components/Video";
-import {  YoutubeService } from "../../services/YoutubeService";
-import { MockYoutubeService } from "../../services/MockYoutubeService";
-import { commonSetting } from "../../setting/setting";
-import { MockVideoService } from "../../services/MockVideoService";
+import { useVideos } from "../../context/VideoContext";
 
 
 export const Videos = () => {
     const { keyword } = useParams() //get dynamic id from url
-    const { isLoading, isError, data: videos, } = useQuery([queryKeys.videos, keyword], () => {
-        if (commonSetting.isVideoMock) {
-            const videoService = new MockVideoService();
-            return videoService.search();
-        }
-        const youtubeService = commonSetting.isProduct? new YoutubeService() : new MockYoutubeService(); 
-        console.log(youtubeService);
-        return youtubeService.search(keyword);
-    }) //usequery: fail to get api, retrieve 모든게 저장되어 있음
+    const {videos, isLoading, isError} = useVideos();
     return (
     <>
         <div>Videos/{`${keyword ? keyword : ""}`}</div>
         {isLoading && <p>Loading...</p>}
         {isError && <p>Something is wrong !</p>}
-        {videos && videos.map((video) => <Video key={video?.id?.videoId || video?.title} video={video}/>)}
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2 gap-y-4">
+            {videos && videos.map((video) => <Video key={video?.id?.videoId || video?.id || video?.title} video={video}/>)}
+        </ul>
     </>
     // use key value for rerendering otherwise undefined error => always rerendering & bad performance 
     )
