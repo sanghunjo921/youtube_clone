@@ -7,14 +7,11 @@ export class MockYoutubeService {
     }
  
     async search(keyword) {
-        return keyword? this.#searchByKeyword(keyword) : this.#mostPopularVideos(); 
+        return  axios.get(`/${queryKeys.videos}/search.json`);
     }
 
-    async #searchByKeyword(keyword) {
-        return axios.get(`/${queryKeys.videos}/search.json`).then((res) => res.data.items);
+    async videos() {
+        return axios.get(`/${queryKeys.videos}/popular.json`);
     }
 
-    async #mostPopularVideos() {
-        return axios.get(`/${queryKeys.videos}/popular.json`).then((res) => res.data.items);
-    }
 }
