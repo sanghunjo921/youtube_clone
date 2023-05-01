@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { queryKeys } from "../common/Constants";
 import { MockVideoService } from "../services/MockVideoService";
 import { MockYoutubeService } from "../services/MockYoutubeService";
+import { YoutubeClient } from "../services/YoutubeClient.js";
 import { YoutubeService } from "../services/YoutubeService";
 import { commonSetting } from "../setting/setting";
 
@@ -17,9 +18,9 @@ export const VideoProvider = ({children}) => {
             const videoService = new MockVideoService();
             return videoService.search();
         }
-        const youtubeService = commonSetting.isProduct? new YoutubeService() : new MockYoutubeService(); 
-        console.log(youtubeService);
-        return youtubeService.search(keyword);
+        const client = commonSetting.isProduct ? new YoutubeClient() : new MockYoutubeService(); 
+        const youtube = new YoutubeService(client);
+        return youtube.search(keyword);
     }) //usequery: fail to get api, retrieve 모든게 저장되어 있음
     return <VideoContext.Provider value={{videos, isLoading, isError}}>{children}</VideoContext.Provider>
 };
