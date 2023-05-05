@@ -12,17 +12,11 @@ import { commonSetting } from "../setting/setting";
 const VideoContext = createContext();
 
 export const VideoProvider = ({children}) => {
-    const { keyword } = useParams() //get dynamic id from url
-    const { isLoading, isError, data: videos, } = useQuery([queryKeys.videos, keyword], () => {
-        if (commonSetting.isVideoMock) {
-            const videoService = new MockVideoService();
-            return videoService.search();
-        }
-        const client = commonSetting.isProduct ? new YoutubeClient() : new MockYoutubeService(); 
-        const youtube = new YoutubeService(client);
-        return youtube.search(keyword);
-    }) //usequery: fail to get api, retrieve 모든게 저장되어 있음
-    return <VideoContext.Provider value={{videos, isLoading, isError}}>{children}</VideoContext.Provider>
+   
+    const client = commonSetting.isProduct ? new YoutubeClient() : new MockYoutubeService(); 
+    const videoAPI = new YoutubeService(client);
+   console.log(videoAPI)
+    return (<VideoContext.Provider value={{videoAPI}}>{children}</VideoContext.Provider>)
 };
 
 export const useVideos = () => useContext(VideoContext)

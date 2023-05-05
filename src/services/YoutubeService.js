@@ -18,19 +18,42 @@ export class YoutubeService {
             },
         }).then((res) => {
             console.log(res.data);
-            return res.data.items
+            return res.data.items.map((item) => ({ ...item, id: item.id.videoId }));
         });
     }
 
 
     async getChannelInfo(id) {
-        this.apiClient.channels({
+        return this.apiClient
+          .channels({
             params: {
-                id,part: 'snippet',
-            }
-        }).then((res) => res.data.items[0].snippet
-        )
+              id,
+              part: "snippet",
+            },
+          })
+          .then((res) => {
+            console.log("channels:", res.data.items[0].snippet, id);
+            return res.data.items[0].snippet.thumbnails.default.url;
+          });
+      }
+ //getRelatedVideols
+      
+    async getRelatedVideols(relatedToVideoId) {
+        return this.apiClient
+        .search({
+            params: {
+            part: "snippet",
+            maxResults: 25,
+            type: "video",
+            relatedToVideoId,
+            },
+        })
+        .then((res) => {
+            console.log(res);
+            return res.data.items.map((item) => ({ ...item, id: item.id.videoId }));
+        });
     }
+    
 
     async #mostPopularVideos() {
         return this.apiClient.videos({
@@ -41,7 +64,7 @@ export class YoutubeService {
                 
             },
         }).then((res) => {
-            console.log(res.data);
+    
             return res.data.items
         });
     }
