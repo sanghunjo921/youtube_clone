@@ -1,11 +1,23 @@
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom"
+import { queryKeys } from "../../common/Constants";
 import { Video } from "../../components/Video";
 import { useVideos } from "../../context/VideoContext";
+import { MockVideoService } from "../../services/MockVideoService";
+import { commonSetting } from "../../setting/setting";
 
 
 export const Videos = () => {
     const { keyword } = useParams() //get dynamic id from url
-    const {videos, isLoading, isError} = useVideos();
+    const {videoAPI} = useVideos();
+    const { isLoading, isError, data: videos, } = useQuery([queryKeys.videos, keyword], () => {
+        if (commonSetting.isVideoMock) {
+            const videoService = new MockVideoService();
+            return videoService.search();
+        }
+       
+        return videoAPI.search(keyword);
+    }) //usequery: fail to get api, retrieve 모든게 저장되어 있음
     return (
     <>
         <div>Videos/{`${keyword ? keyword : ""}`}</div>

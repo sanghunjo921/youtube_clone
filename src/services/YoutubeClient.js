@@ -20,5 +20,11 @@ export class YoutubeClient {
         return this.apiClient.get("videos", params);
     
     } 
+
+    async channels(params) {
+        return this.apiClient.get('channels', params);
+    }
+
+    
 }
 
